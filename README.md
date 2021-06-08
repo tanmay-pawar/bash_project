@@ -1,2 +1,2 @@
-This repository contain bash project in namely bash_project_1 and bash_project_2
+This repository contain bash projects namely, bash_project_1 and bash_project_2
 
