@@ -1,0 +1,5 @@
+vlc
+firefox
+js
+tan
+grep

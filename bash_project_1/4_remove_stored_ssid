@@ -1,0 +1,30 @@
+#!/bin/bash
+ # following script removes stored ssid with name given by user
+ 
+ # taking ssid name from user
+	 echo enter name of ssid to delete 
+	read name
+
+# removing ssid
+	if test -f "/etc/NetworkManager/system-connections/$name.nmconnection"; then
+	    rm  /etc/NetworkManager/system-connections/$name.nmconnection 
+	    echo stored SSID $name removed successfully.
+	    exit 0
+	else 
+	    echo No stored SSID found with name $name
+	    exit 1
+fi
+ 
+ 
+ 
+ 
+
+ 
+
+
+
+
+
+
+
+
