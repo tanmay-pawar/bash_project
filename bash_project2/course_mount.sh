@@ -1,5 +1,11 @@
 #!/bin/bash
  # following script will mount folders as different user
+ 
+ 
+user=$1
+source_path=/home/user1/bash_project/bash_project2/data/courses
+target_path=/home/$user
+
 
 # Create an array which holds list of courses. This should be used to compare if the course name is passed in CLI
 	courses=(
@@ -10,7 +16,7 @@
 	"sql_course/sqlfundamental1"
 	"sql_course/sqlfundamental2"
 	)
-	user=$1
+
 # function for usage help
 	usage() {
 	echo "usage:
@@ -42,6 +48,7 @@
 			do 
 			if [ "$i" == "$1" ];then 
 				temp=1
+				break;
 			
 			fi
 			done
@@ -56,7 +63,13 @@
 				  
 				mkdir -p /home/$user/$1
 				# Mount the source to target
-				bindfs -p a-w -u $user -g ftpaccess /home/user1/bash_project/bash_project2/data/courses/$1 /home/$user/$1
+				bindfs -p 550 -u $user -g ftpaccess $source_path/$1 $target_path/$1
+				if [ $? -eq 0 ]; then
+					echo course $1 is mounted
+				else 
+					exit 2
+					
+				fi
 			else
 				echo course $1 already exist
 			fi
@@ -70,6 +83,9 @@
 		for course in "${courses[@]}"
 			do 
 				mount_course $course
+				if [ $? -ne 0 ]; then
+					echo failed to mount course $course
+				fi
 			done
 	   
 	}
@@ -79,10 +95,15 @@
 		check_mount /home/$user/$1
 
 		if [ $? -ne 0 ]; then
-			umount /home/$user/$1
-			rm -rf /home/$user/$1
+			umount $target_path/$1
+			if [ $? -eq 0 ]; then
+				rm -rf $target_path/$1
+				echo course $1 is unmounted
+			else 
+				exit 2
+			fi
 		else 
-		echo no such course enrolled
+		echo you have not enrolled to course $1
 		fi
 	   
 	}
@@ -94,49 +115,52 @@
 	 	for course in "${courses[@]}"
 		do 
 			unmount_course $course
+			if [ $? -ne 0 ]; then
+				echo failed to unmount course $course
+			fi
 		done
 	}
 
 case $2 in
 
-  -h)
-    usage
-    ;;
+	  -h)
+	    usage
+	    ;;
 
-  -m)
-    if [ -z $3 ];then
-    	mount_all
-    elif [[ "$3" == "-c" ]];
-    then
-   
-    	if [ -z $4 ];then
-    	echo please provide course name 
-    	exit 0
-    	else 
-    	mount_course $4 
-    	fi
-    else 
-    echo please use correct option
-    usage 
-    fi
-    ;;
+	  -m)
+	    if [ -z $3 ];then
+	    	mount_all
+	    elif [[ "$3" == "-c" ]];
+	    then
+	   
+	    	if [ -z $4 ];then
+	    	echo please provide course name 
+	    	exit 0
+	    	else 
+	    	mount_course $4 
+	    	fi
+	    else 
+	    echo please use correct option
+	    usage 
+	    fi
+	    ;;
 
-  -u)
-    if [ -z $3 ];then
-    	unmount_all
-    elif [[ "$3" == "-c" ]];
-    then
-    	if [ -z $4 ];then
-    	echo please provide course name 
-    	exit 0
-    	else 
-    	unmount_course $4 
-    	fi
-    else 
-    echo please use correct option
-    usage 
-    fi
-    ;;
+	  -u)
+	    if [ -z $3 ];then
+	    	unmount_all
+	    elif [[ "$3" == "-c" ]];
+	    then
+	    	if [ -z $4 ];then
+	    	echo please provide course name 
+	    	exit 0
+	    	else 
+	    	unmount_course $4 
+	    	fi
+	    else 
+	    echo please use correct option
+	    usage 
+	    fi
+	    ;;
 
   
 esac
